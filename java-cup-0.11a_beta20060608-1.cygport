@@ -1,0 +1,28 @@
+ORIG_PN="javacup"
+inherit ant
+
+DESCRIPTION="LALR parser generator for Java"
+HOMEPAGE="http://www2.cs.tum.edu/projects/cup/"
+SRC_URI="mirror://gentoo/${ORIG_PN}-${PV}.tar.bz2"
+
+src_compile() {
+	lndirs
+	cd ${B}
+
+	# bootstrap, then rebuild
+	cygant
+	mv -f dist/java-cup-11a.jar bin/java-cup-11.jar
+	cygant clean
+	cygant
+
+	${JAVADOC} -d javadoc/ -sourcepath src/ java_cup
+}
+
+src_install() {
+	cd ${B}
+	dojar dist/java-cup-11a.jar
+	newjar dist/java-cup-11a-runtime.jar java-cup-runtime-11a.jar
+	java_wrapper java_cup java-cup-11a.jar java_cup.Main
+	dojavadoc javadoc/
+	dodoc manual.html
+}
